@@ -42,8 +42,9 @@ namespace EntityOrnek
                         select new
                         {
                             item.NOTID,
-                            item.OGR,
-                            item.DERS,
+                            item.TBLOGRENCI.AD,
+                            item.TBLOGRENCI.SOYADI,
+                            item.TBLDERSLER.DERSAD,
                             item.SINAV1,
                             item.SINAV2,
                             item.SINAV3,
@@ -128,9 +129,9 @@ namespace EntityOrnek
                 List<TBLOGRENCI> liste4 = db.TBLOGRENCI.Where(p => p.ID == 5).ToList();
                 dataGridView1.DataSource = liste4;
             }
-            if (radioButton5.Checked==true)
+            if (radioButton5.Checked == true)
             {
-                List<TBLOGRENCI>liste5 =db.TBLOGRENCI.Where(p=>p.AD.StartsWith("A")).ToList();
+                List<TBLOGRENCI> liste5 = db.TBLOGRENCI.Where(p => p.AD.StartsWith("A")).ToList();
                 dataGridView1.DataSource = liste5;
             }
             if (radioButton6.Checked == true)
@@ -138,27 +139,81 @@ namespace EntityOrnek
                 List<TBLOGRENCI> liste6 = db.TBLOGRENCI.Where(p => p.AD.EndsWith("A")).ToList();
                 dataGridView1.DataSource = liste6;
             }
-            if (radioButton7.Checked==true)
+            if (radioButton7.Checked == true)
             {
                 bool deger = db.TBLKULUPLER.Any();
-                MessageBox.Show(deger.ToString(),"Bilgi",MessageBoxButtons.OK,MessageBoxIcon.Information);
+                MessageBox.Show(deger.ToString(), "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            if (radioButton8.Checked==true)
+            if (radioButton8.Checked == true)
             {
                 int toplam = db.TBLOGRENCI.Count();
                 toplam++;
                 MessageBox.Show(toplam.ToString(), "Toplam Öğrenci Sayısı", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            if(radioButton9.Checked==true)
+            if (radioButton9.Checked == true)
             {
                 var toplam = db.TBLNOTLAR.Sum(p => p.SINAV1);
                 MessageBox.Show("Sınav 1 Toplam Puan : " + toplam.ToString());
             }
-            if (radioButton10.Checked==true)
+            if (radioButton10.Checked == true)
             {
                 var ortalama = db.TBLNOTLAR.Average(p => p.SINAV1);
                 MessageBox.Show("Sınav 1 Not ortalaması :" + ortalama.ToString());
             }
+            if (radioButton11.Checked == true)
+            {
+                var ortalama = db.TBLNOTLAR.Average(p => p.SINAV1);
+                List<TBLNOTLAR> liste7 = db.TBLNOTLAR.Where(p => p.SINAV1 > ortalama).ToList();
+                dataGridView1.DataSource = liste7;
+            }
+            if (radioButton12.Checked == true)
+            {
+                var enyuksek = db.TBLNOTLAR.Max(p => p.SINAV1);
+                MessageBox.Show("1.Sınavın en yüksek notu : " + enyuksek);
+            }
+            if (radioButton13.Checked == true)
+            {
+                var endusuk = db.TBLNOTLAR.Min(p => p.SINAV1);
+                MessageBox.Show("1.Sınavın en düşük notu : " + endusuk);
+            }
+            if (radioButton14.Checked == true)
+            {
+                var enyuksekisim = db.TBLNOTLAR.Max(p => p.SINAV1);
+                dataGridView1.DataSource = db.NOTLISTESI().Where(p => p.SINAV1 == enyuksekisim).ToList();
+
+                //var yuksekalan = db.TBLNOTLAR.Max(p => p.SINAV1);
+                //var ogrencikim = from item in db.NOTLISTESI()
+                //                 where item.SINAV1 == yuksekalan
+                //                 select new
+                //                 {
+                //                     item.AD_SOYAD,
+                //                     item.DERSAD,
+                //                     item.SINAV1
+                //                 };
+                //dataGridView1.DataSource = ogrencikim.ToList();
+            }
+        }
+
+        private void btnJoin_Click(object sender, EventArgs e)
+        {
+            var sorgu = from d1 in db.TBLNOTLAR
+                        join d2 in db.TBLOGRENCI
+                        on d1.OGR equals d2.ID
+                        join d3 in db.TBLDERSLER
+                        on d1.DERS equals d3.DERSID
+
+
+                        select new
+                        {
+                            ÖĞRENCİ = d2.AD + " " + d2.SOYADI,
+                            DERS = d3.DERSAD,
+                            //SOYAD=d2.SOYADI,
+                            SINAV1 = d1.SINAV1,
+                            SINAV2 = d1.SINAV2,
+                            SINAV3 = d1.SINAV3,
+                            ORTALAMA = d1.ORTALAMA,
+                        };
+            dataGridView1.DataSource = sorgu.ToList();
         }
     }
 }
